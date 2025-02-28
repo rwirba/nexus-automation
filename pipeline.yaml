@@ -1,0 +1,92 @@
+pipeline:
+  name: Nexus Automation
+  identifier: nexus_automation
+  projectIdentifier: default_project
+  orgIdentifier: default
+  stages:
+    - stage:
+        name: Clone Repository
+        identifier: clone_repo
+        type: CI
+        spec:
+          execution:
+            steps:
+              - step:
+                  name: Clone Repo
+                  identifier: clone
+                  type: GitClone
+                  spec:
+                    connectorRef: github_connector
+                    repoName: rwibra/nexus-automation
+                    branch: master
+
+    - stage:
+        name: Deploy Helm to Rancher
+        identifier: deploy_helm
+        type: Deployment
+        spec:
+          service:
+            serviceDefinition:
+              type: Kubernetes
+              spec:
+                manifests:
+                  - manifest:
+                      identifier: helmChart
+                      type: HelmChart
+                      spec:
+                        store:
+                          type: Git
+                          spec:
+                            connectorRef: github_connector
+                            repoName: rwibra/nexus-automation
+                            branch: master
+                            paths:
+                              - helm/
+        execution:
+          steps:
+            - step:
+                name: Deploy Helm Chart
+                identifier: deploy_helm_chart
+                type: HelmDeploy
+                spec:
+                  releaseName: nexus-automation
+                  namespace: nexus-automation
+                  chartPath: helm/
+                  valuesYaml: helm/values.yaml
+
+    - stage:
+        name: Upload to Nexus
+        identifier: upload_nexus
+        type: CI
+        spec:
+          execution:
+            steps:
+              - step:
+                  name: Compare Versions
+                  identifier: compare_versions
+                  type: Run
+                  spec:
+                    shell: Bash
+                    command: |
+                      chmod +x scripts/compare_versions.py
+                      python3 scripts/compare_versions.py
+
+              - step:
+                  name: Download Binaries
+                  identifier: download_binaries
+                  type: Run
+                  spec:
+                    shell: Bash
+                    command: |
+                      chmod +x scripts/download_binaries.sh
+                      ./scripts/download_binaries.sh
+
+              - step:
+                  name: Upload to Nexus
+                  identifier: upload_to_nexus
+                  type: Run
+                  spec:
+                    shell: Bash
+                    command: |
+                      chmod +x scripts/upload_to_nexus.py
+                      python3 scripts/upload_to_nexus.py
