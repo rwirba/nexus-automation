@@ -1,0 +1,6 @@
+apiVersion: v2
+name: nexus-update-job
+description: Helm chart for Nexus automation in Rancher
+type: application
+version: 1.0.0
+appVersion: 1.0.0
