@@ -29,21 +29,23 @@ pipeline:
           execution:
             steps:
               - step:
+                  type: GitClone
+                  name: GitClone_1
+                  identifier: GitClone_1
+                  spec:
+                    connectorRef: account.gitconnector
+                    repoName: nexus-automation
+                    depth: 1
+                    sslVerify: true
+                    build:
+                      type: branch
+                      spec:
+                        branch: master
+              - step:
                   type: Run
                   name: Run_1
                   identifier: Run_1
                   spec:
-                    connectorRef: account.harnessImage
+                    connectorRef: nexus
                     image: nexus.kihhuf.org:8082/nexus-automation-runner:latest
                     shell: Sh
-                    command: |-
-                      echo "Checking for software updates..."
-                      python3 /harness/workspace/scripts/compare_versions.py
-
-                      echo "Downloading new versions..."
-                      bash /harness/workspace/scripts/download_binaries.sh
-
-                      echo "Uploading new versions to Nexus..."
-                      python3 /harness/workspace/scripts/upload_to_nexus.py
-
-                      echo "Update process completed!"
