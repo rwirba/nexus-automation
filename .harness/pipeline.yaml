@@ -27,6 +27,12 @@ pipeline:
         identifier: check_update
         type: CI
         spec:
+          infrastructure:
+            type: Docker
+            spec:
+              connectorRef: docker_connector
+              image: "nexus.kihhuf.org:8082/nexus-automation-runner:latest"
+              shell: Bash
           execution:
             steps:
               - step:
@@ -37,7 +43,7 @@ pipeline:
                     shell: Bash
                     command: |
                       echo "Pulling Docker Image from Nexus..."
-                      docker pull nexus.example.com/nexus-automation-runner:latest
+                      docker pull nexus.kihhuf.org:8082/nexus-automation-runner:latest
 
                       echo "Running the container and mounting workspace..."
                       docker run --rm -v /harness/workspace:/workspace nexus.kihhuf.org:8082/nexus-automation-runner:latest /bin/bash -c "
