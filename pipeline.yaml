@@ -25,8 +25,9 @@ pipeline:
         identifier: deploy_helm
         type: Deployment
         spec:
-          deploymentType: Kubernetes  # <-- Add this line
+          deploymentType: Kubernetes
           service:
+            serviceRef: nexus_automation_service  # <-- Add this line
             serviceDefinition:
               type: Kubernetes
               spec:
@@ -43,6 +44,13 @@ pipeline:
                             branch: master
                             paths:
                               - helm/
+          infrastructure:  # <-- Add this section
+            environmentRef: dev_environment
+            infrastructureDefinition:
+              type: KubernetesDirect
+              spec:
+                connectorRef: rancher_k8s_connector
+                namespace: nexus-automation
           execution:
             steps:
               - step:
