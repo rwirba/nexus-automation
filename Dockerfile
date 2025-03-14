@@ -1,5 +1,5 @@
 # Base image with required tools
-FROM ubuntu:22.04:latest
+FROM ubuntu:22.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 
