@@ -25,6 +25,7 @@ pipeline:
         identifier: deploy_helm
         type: Deployment
         spec:
+          deploymentType: Kubernetes  # <-- Add this line
           service:
             serviceDefinition:
               type: Kubernetes
