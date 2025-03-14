@@ -3,115 +3,54 @@ pipeline:
   identifier: nexus_automation
   projectIdentifier: default_project
   orgIdentifier: default
-  tags: {}
-
   stages:
     - stage:
         name: Clone Repository
         identifier: clone_repo
         type: CI
-        failureStrategies:
-          - onFailure:
-              errors:
-                - AllErrors
-              action:
-                type: Retry
-                spec:
-                  retryCount: 3
         spec:
-          execution:  # ✅ This was added to fix the missing execution section in CI
+          execution:
             steps:
               - step:
                   name: Clone Repo
-                  identifier: clone
+                  identifier: clone_repo_step
                   type: GitClone
                   spec:
                     connectorRef: github_connector
                     repoName: rwirba/nexus-automation
                     branch: master
-
+                    buildEnvironment:
+                      mountPath: /harness/workspace
+                      
     - stage:
-        name: Deploy Helm to Rancher
-        identifier: deploy_helm
-        type: Deployment
-        failureStrategies:
-          - onFailure:
-              errors:
-                - AllErrors
-              action:
-                type: Abort
+        name: Check & Update Software
+        identifier: check_update
+        type: CI
         spec:
-          service:
-            serviceDefinition:
-              type: Kubernetes
-              deploymentType: Kubernetes  # ✅ This was added to fix the missing deploymentType
-              spec:
-                manifests:
-                  - manifest:
-                      identifier: helmChart
-                      type: HelmChart
-                      spec:
-                        store:
-                          type: Git
-                          spec:
-                            connectorRef: github_connector
-                            repoName: rwirba/nexus-automation
-                            branch: master
-                            paths:
-                              - helm/
           execution:
             steps:
               - step:
-                  name: Deploy Helm Chart
-                  identifier: deploy_helm_chart
-                  type: HelmDeploy
-                  spec:
-                    releaseName: nexus-automation
-                    namespace: prod  # ✅ Change to "prod" or "nonprod"
-                    chartPath: helm/
-                    valuesYaml: helm/values.yaml
-          environment:
-            environmentRef: prod  # ✅ Change based on deployment
-            deployToAll: false
-            infrastructureDefinitions:
-              - identifier: rancher_k8s
-
-    - stage:
-        name: Upload to Nexus
-        identifier: upload_nexus
-        type: CI
-        failureStrategies:
-          - onFailure:
-              errors:
-                - AllErrors
-              action:
-                type: Ignore
-        spec:
-          execution:  # ✅ This was added to fix the missing execution section in CI
-            steps:
-              - step:
-                  name: Compare Versions
-                  identifier: compare_versions
+                  name: Run Container & Execute Jobs
+                  identifier: run_container
                   type: Run
                   spec:
                     shell: Bash
                     command: |
-                      python3 /harness/workspace/nexus-automation/scripts/compare_versions.py
+                      echo "Pulling Docker Image from Nexus..."
+                      docker pull nexus.example.com/nexus-automation-runner:latest
 
-              - step:
-                  name: Download Binaries
-                  identifier: download_binaries
-                  type: Run
-                  spec:
-                    shell: Bash
-                    command: |
-                      /harness/workspace/nexus-automation/scripts/download_binaries.sh
+                      echo "Running the container and mounting workspace..."
+                      docker run --rm -v /harness/workspace:/workspace nexus.kihhuf.org:8082/nexus-automation-runner:latest /bin/bash -c "
+                        echo 'Checking for software updates...'
+                        python3 /workspace/scripts/compare_versions.py
 
-              - step:
-                  name: Upload to Nexus
-                  identifier: upload_to_nexus
-                  type: Run
-                  spec:
-                    shell: Bash
-                    command: |
-                      python3 /harness/workspace/nexus-automation/scripts/upload_to_nexus.py
+                        echo 'Downloading new versions...'
+                        bash /workspace/scripts/download_binaries.sh
+
+                        echo 'Uploading new versions to Nexus...'
+                        python3 /workspace/scripts/upload_to_nexus.py
+
+                        echo 'Update process completed!'
+                      "
+
+                      echo "Process complete. Container removed."
