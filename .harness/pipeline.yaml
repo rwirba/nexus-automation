@@ -1,64 +1,49 @@
 pipeline:
-  name: Nexus Automation
-  identifier: nexus_automation
+  name: nexus-automation
+  identifier: nexusautomation
   projectIdentifier: default_project
   orgIdentifier: default
+  tags: {}
+  properties:
+    ci:
+      codebase:
+        connectorRef: account.gitconnector
+        repoName: nexus-automation
+        build: <+input>
   stages:
     - stage:
-        name: Clone Repository
-        identifier: clone_repo
+        name: gitclone
+        identifier: gitclone
+        description: ""
         type: CI
         spec:
+          cloneCodebase: true
           infrastructure:
-            type: KubernetesDirect  
+            type: KubernetesDirect
             spec:
-              connectorRef: kubernetes_connector  
-              namespace: harness  
-          
-            execution:
-              steps:
-                - step:
-                    name: Clone Repo
-                    identifier: clone_repo_step
-                    type: GitClone
-                    spec:
-                      connectorRef: github_connector
-                      repoName: rwirba/nexus-automation
-                      branch: master
-                      buildEnvironment:
-                        mountPath: /harness/workspace
-
-    - stage:
-        name: Check and Update Software
-        identifier: check_update
-        type: CI
-        spec:
-          infrastructure:
-            type: KubernetesDirect  
-            spec:
-              connectorRef: kubernetes_connector
-              namespace: harness
+              connectorRef: account.kubernetes_connector
+              namespace: default
+              automountServiceAccountToken: true
+              nodeSelector: {}
+              os: Linux
           execution:
             steps:
               - step:
-                  name: Run Container and Execute Jobs
-                  identifier: run_container
                   type: Run
+                  name: Run_1
+                  identifier: Run_1
                   spec:
-                    shell: Bash
-                    command: |
-                      echo "Pulling Docker Image from Nexus..."
-                      kubectl run nexus-runner --image=nexus.kihhuf.org:8082/nexus-automation-runner:latest --restart=Never -- /bin/bash -c "
-                        echo 'Checking for software updates...'
-                        python3 /workspace/scripts/compare_versions.py
+                    connectorRef: account.harnessImage
+                    image: nexus.kihhuf.org:8082/nexus-automation-runner:latest
+                    shell: Sh
+                    command: |-
+                      echo "Checking for software updates..."
+                      python3 /harness/workspace/scripts/compare_versions.py
 
-                        echo 'Downloading new versions...'
-                        bash /workspace/scripts/download_binaries.sh
+                      echo "Downloading new versions..."
+                      bash /harness/workspace/scripts/download_binaries.sh
 
-                        echo 'Uploading new versions to Nexus...'
-                        python3 /workspace/scripts/upload_to_nexus.py
+                      echo "Uploading new versions to Nexus..."
+                      python3 /harness/workspace/scripts/upload_to_nexus.py
 
-                        echo 'Update process completed!'
-                      "
-
-                      echo "Process complete."
+                      echo "Update process completed!"
