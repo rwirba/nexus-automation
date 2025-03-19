@@ -46,6 +46,6 @@ pipeline:
                   name: Run_1
                   identifier: Run_1
                   spec:
-                    connectorRef: nexus
+                    connectorRef: account.Sonatype_Nexus
                     image: nexus.kihhuf.org:8082/nexus-automation-runner:latest
                     shell: Sh
