@@ -1,0 +1,39 @@
+pipeline:
+  name: nexus-automation
+  identifier: nexusautomation
+  projectIdentifier: InfraAutomation
+  orgIdentifier: default
+  tags: {}
+  stages:
+    - stage:
+        name: Git Clone
+        identifier: Git_Clone
+        description: ""
+        type: CI
+        spec:
+          cloneCodebase: true
+          infrastructure:
+            type: KubernetesDirect
+            spec:
+              connectorRef: account.kubernetes_connector
+              namespace: harness-delegate-ng
+              automountServiceAccountToken: true
+              nodeSelector: {}
+              os: Linux
+          execution:
+            steps:
+              - step:
+                  type: GitClone
+                  name: GitClone_1
+                  identifier: GitClone_1
+                  spec:
+                    connectorRef: harnessgitconnector
+                    build:
+                      type: branch
+                      spec:
+                        branch: master
+  properties:
+    ci:
+      codebase:
+        connectorRef: harnessgitconnector
+        build: <+input>
