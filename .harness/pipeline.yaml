@@ -28,7 +28,7 @@ pipeline:
                             cd nexus-automation && git pull && cd ..
                           else
                             rm -rf nexus-automation
-                            git clone REPO_URL
+                            git clone "$REPO_URL"
                           fi
                     environmentVariables:
                       - name: REPO_URL
