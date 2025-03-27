@@ -25,9 +25,9 @@ pipeline:
                       spec:
                         script: |
                           if [ -d "$REPO_NAME/.git" ]; then
-                            cd REPO_NAME && git pull && cd ..
+                            cd nexus-automation && git pull && cd ..
                           else
-                            rm -rf REPO_NAME
+                            rm -rf nexus-automation
                             git clone REPO_URL
                           fi
                     environmentVariables:
