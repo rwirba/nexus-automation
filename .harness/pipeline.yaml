@@ -23,8 +23,23 @@ pipeline:
                     source:
                       type: Inline
                       spec:
-                        script: git clone https://github.com/rwirba/nexus-automation.git
-                    environmentVariables: []
+                        script: |
+                          if [ -d "$REPO_NAME/.git" ]; then
+                            cd REPO_NAME && git pull && cd ..
+                          else
+                            rm -rf REPO_NAME
+                            git clone REPO_URL
+                          fi
+                    environmentVariables:
+                      - name: REPO_URL
+                        type: String
+                        value: https://github.com/rwirba/nexus-automation.git
+                      - name: REPO_NAME
+                        type: String
+                        value: nexus-automation
+                      - name: IMAGE_NAME
+                        type: String
+                        value: nexus.kihhuf.org:8081/nexus-automation-runner:latest
                     outputVariables: []
                   timeout: 10m
               - step:
