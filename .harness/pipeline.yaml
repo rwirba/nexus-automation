@@ -72,6 +72,7 @@ pipeline:
                             drop: []
                             add: []
                         nodeSelector: {}
+                        serviceAccountName: helm-delegate
                     reports:
                       type: JUnit
                       spec:
