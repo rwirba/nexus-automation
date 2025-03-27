@@ -1,0 +1,30 @@
+pipeline:
+  name: infra-nexus-automation
+  identifier: infranexusautomation
+  projectIdentifier: InfraAutomation
+  orgIdentifier: default
+  tags: {}
+  stages:
+    - stage:
+        name: Git-Clone
+        identifier: GitClone
+        description: ""
+        type: Custom
+        spec:
+          execution:
+            steps:
+              - step:
+                  type: ShellScript
+                  name: clone repo
+                  identifier: clone_repo
+                  spec:
+                    shell: Bash
+                    executionTarget: {}
+                    source:
+                      type: Inline
+                      spec:
+                        script: git clone https://github.com/rwirba/nexus-automation.git
+                    environmentVariables: []
+                    outputVariables: []
+                  timeout: 10m
+        tags: {}
