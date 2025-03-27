@@ -78,5 +78,7 @@ pipeline:
                         paths: []
                     outputVariables: []
                     envVariables: {}
+                    delegateSelectors:
+                      - helm-delegate
                   timeout: 10m
         tags: {}
