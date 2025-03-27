@@ -73,6 +73,8 @@ pipeline:
                             add: []
                         nodeSelector: {}
                         serviceAccountName: helm-delegate
+                        os: Linux
+                        automountServiceAccountToken: true
                     reports:
                       type: JUnit
                       spec:
@@ -81,5 +83,6 @@ pipeline:
                     envVariables: {}
                     delegateSelectors:
                       - helm-delegate
+                    imagePullPolicy: Always
                   timeout: 10m
         tags: {}
