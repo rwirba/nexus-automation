@@ -27,19 +27,10 @@ pipeline:
                     environmentVariables: []
                     outputVariables: []
                   timeout: 10m
-        tags: {}
-    - stage:
-        name: Docker Build
-        identifier: Docker_Build
-        description: ""
-        type: Custom
-        spec:
-          execution:
-            steps:
               - step:
                   type: Container
-                  name: Run_container
-                  identifier: Run_container
+                  name: Docker_Build
+                  identifier: Docker_Build
                   spec:
                     connectorRef: account.harnessImage
                     image: nexus.kihhuf.org:8081/nexus-automation-runner:latest
