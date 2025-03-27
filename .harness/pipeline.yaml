@@ -60,7 +60,7 @@ pipeline:
                       type: KubernetesDirect
                       spec:
                         connectorRef: account.kubernetes_connector
-                        namespace: harness-delegate
+                        namespace: harness-delegate-ng
                         resources:
                           limits:
                             cpu: "0.5"
