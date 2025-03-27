@@ -28,3 +28,49 @@ pipeline:
                     outputVariables: []
                   timeout: 10m
         tags: {}
+    - stage:
+        name: Docker Build
+        identifier: Docker_Build
+        description: ""
+        type: Custom
+        spec:
+          execution:
+            steps:
+              - step:
+                  type: Container
+                  name: Run_container
+                  identifier: Run_container
+                  spec:
+                    connectorRef: account.harnessImage
+                    image: nexus.kihhuf.org:8081/nexus-automation-runner:latest
+                    command: |
+                      cd ${HARNESS_WORKSPACE}/scripts && \
+                      chmod +x download_binaries.sh && \
+                      ./download_binaries.sh && \
+                      python3 compare_versions.py && \
+                      python3 upload_to_nexus.py
+                    shell: Sh
+                    infrastructure:
+                      type: KubernetesDirect
+                      spec:
+                        connectorRef: account.kubernetes_connector
+                        namespace: harness-delegate-ng
+                        resources:
+                          limits:
+                            cpu: "0.5"
+                            memory: 500Mi
+                        annotations: {}
+                        labels: {}
+                        containerSecurityContext:
+                          capabilities:
+                            drop: []
+                            add: []
+                        nodeSelector: {}
+                    reports:
+                      type: JUnit
+                      spec:
+                        paths: []
+                    outputVariables: []
+                    envVariables: {}
+                  timeout: 10m
+        tags: {}
