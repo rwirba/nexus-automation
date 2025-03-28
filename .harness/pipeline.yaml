@@ -47,7 +47,7 @@ pipeline:
                   name: Docker_Build
                   identifier: Docker_Build
                   spec:
-                    connectorRef: account.harnessImage
+                    connectorRef: nexusregistryconnector
                     image: docker.kihhuf.org/nexus-automation-runner:latest
                     command: |
                       cd ${HARNESS_WORKSPACE}/scripts && \
