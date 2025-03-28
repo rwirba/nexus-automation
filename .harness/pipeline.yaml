@@ -48,7 +48,7 @@ pipeline:
                   identifier: Docker_Build
                   spec:
                     connectorRef: nexusregistryconnector
-                    image: docker.kihhuf.org/nexus-automation-runner:latest
+                    image: <+artifact.image>
                     command: |
                       cd ${HARNESS_WORKSPACE}/scripts && \
                       chmod +x download_binaries.sh && \
