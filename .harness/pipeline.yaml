@@ -39,7 +39,7 @@ pipeline:
                         value: nexus-automation
                       - name: IMAGE_NAME
                         type: String
-                        value: nexus.kihhuf.org:8081/nexus-automation-runner:latest
+                        value: docker.kihhuf.org/nexus-automation-runner:latest
                     outputVariables: []
                   timeout: 10m
               - step:
