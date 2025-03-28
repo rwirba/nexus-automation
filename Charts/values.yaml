@@ -1,0 +1,17 @@
+name: nexus-runner
+replicaCount: 1
+
+image:
+  repository: docker.kihhuf.org/nexus-automation-runner
+  tag: latest
+  pullPolicy: Always
+
+dockercfg: <+artifact.imagePullSecret>
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 250m
+    memory: 256Mi
